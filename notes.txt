@@ -1,0 +1,6 @@
+// broswer sends a get request -> when it needs something
+// when we summit data it sends a post request
+// http have some methods 
+get -> lists all the users. 
+post -> post about the users
+

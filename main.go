@@ -1,16 +1,20 @@
 package main
 
 import (
-    "fmt"
+    
     "log"
     "net/http"
+    "Go_server_no_dep/src"
 )
-func hello(w http.ResponseWriter, r *http.Request){
-	fmt.Fprintf(w, "hello world")
-}
+
+
 func main() {
     mux := http.NewServeMux()
-	mux.HandleFunc("/Hello", hello)
+	// mux.HandleFunc("/Hello", src.Hello)
+    mux.HandleFunc("POST /users", src.CreateUser)
+    mux.HandleFunc("GET /users", src.UserReturn)
+    mux.HandleFunc("GET /users/{id}", src.UserWithID)
+
 
 	server := &http.Server{
         Addr: ":8080",
@@ -19,4 +23,5 @@ func main() {
     log.Println("Server starting on http://localhost:8080")
     log.Fatal(server.ListenAndServe())
 }
+// broswer sends a get request -> when it needs something
 
