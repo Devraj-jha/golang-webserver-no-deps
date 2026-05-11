@@ -1,13 +1,27 @@
 package main
 
 import (
-    
-    "log"
-    "net/http"
-    "Go_server_no_dep/src"
+	"Go_server_no_dep/src"
+	"log"
+	"net/http"
+	"sync"
 )
+type User struct {
+    ID   string `json:"id"`
+    Name string `json:"name"`
+    Age  int    `json:"age"`
+}
 
+type UserStore struct {
+    mu sync.RWMutex // prevents data corruption. when multiple request happen.
+    users map[string]User // store users 
 
+}
+func NewUserStore() *UserStore{
+    return &UserStore{
+        users: make(map[string]User),
+    }
+}
 func main() {
     mux := http.NewServeMux()
 	// mux.HandleFunc("/Hello", src.Hello)
