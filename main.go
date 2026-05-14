@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	// Create the user store (our "database")
+	// Create the user store
 	store := src.NewUserStore()
 
 	// Set up the router
