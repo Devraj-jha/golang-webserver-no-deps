@@ -1,41 +1,76 @@
 package src
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 )
 
+// UserReturn handles GET /users - returns all users
+func (s *UserStore) UserReturn(w http.ResponseWriter, r *http.Request) {
+	s.Mu.RLock()
+	defer s.Mu.RUnlock()
 
-func UserReturn(w http.ResponseWriter, r *http.Request){
-     fmt.Fprintf(w, "Will return a list of users")
+	// Convert map to slice for JSON array
+	userList := make([]User, 0, len(s.Users))
+	for _, user := range s.Users {
+		userList = append(userList, user)
+	}
 
-
-}
-func CreateUser(w http.ResponseWriter, r *http.Request){
-     fmt.Fprintf(w, "Will create users")
-
-}
-func UserWithID(w http.ResponseWriter, r *http.Request){
-     id := r.PathValue("id")
-
-     fmt.Print("will return user with id: %s", id)
-
-
+	WriteJSON(w, http.StatusOK, userList)
 }
 
-// takes a go value, converts it into json, sends it back to the clinet. 
-// with an http status code.
-func writeJSON(w http.ResponseWriter, status int, v any) error {
-     w.Header().Set("Content-Type", "application/json")
-     w.WriteHeader(status)
-     return json.NewEncoder(w).Encode(v)
+// CreateUser handles POST /users - creates a new user
+func (s *UserStore) CreateUser(w http.ResponseWriter, r *http.Request) {
+	var newUser User
+	
+	// Read JSON from request body
+	if err := ReadJSON(r, &newUser); err != nil {
+		http.Error(w, "Invalid JSON format", http.StatusBadRequest)
+		return
+	}
+
+	// Generate unique ID using timestamp
+	newUser.ID = fmt.Sprintf("%d", time.Now().UnixNano())
+
+	// Store the user (write lock needed)
+	s.Mu.Lock()
+	defer s.Mu.Unlock()
+	s.Users[newUser.ID] = newUser
+
+	// Return 201 Created with the user data
+	WriteJSON(w, http.StatusCreated, newUser)
 }
-// It takes JSON from the request body and converts it into a Go struct or variable.
-func readJSON(r *http.Request, dest any) error {
 
-    return json.NewDecoder(r.Body).Decode(dest)
-    
+// UserWithID handles GET /users/{id} - returns a single user
+func (s *UserStore) UserWithID(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+
+	s.Mu.RLock()
+	defer s.Mu.RUnlock()
+
+	user, exists := s.Users[id]
+	if !exists {
+		http.Error(w, "User not found", http.StatusNotFound)
+		return
+	}
+
+	WriteJSON(w, http.StatusOK, user)
 }
 
+// DeleteUser handles DELETE /users/{id} - deletes a user
+func (s *UserStore) DeleteUser(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
 
+	s.Mu.Lock()
+	defer s.Mu.Unlock()
+
+	_, exists := s.Users[id]
+	if !exists {
+		http.Error(w, "User not found", http.StatusNotFound)
+		return
+	}
+
+	delete(s.Users, id)
+	w.WriteHeader(http.StatusNoContent) // 204 No Content
+}
