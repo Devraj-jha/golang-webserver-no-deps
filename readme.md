@@ -1,61 +1,97 @@
-```markdown
-# Go Web Server - No Dependencies
+````markdown
+# Go Web Server (Standard Library Only)
 
-A production-ready REST API web server built entirely with Go's standard library, featuring Go 1.22's enhanced routing patterns. This project demonstrates how to build a complete web server with user management (CRUD operations) using only the standard library - no third-party dependencies.
+A lightweight REST API server built entirely with Go’s standard library using Go 1.22 routing features.
+
+This project demonstrates how to build a clean and production-ready web server without third-party dependencies while supporting user CRUD operations, JSON handling, and concurrent request safety.
+
+---
 
 ## Features
 
-- REST API for user management (Create, Read, Delete)
-- In-memory data store with thread-safe access using mutexes
-- Go 1.22 method-based routing with path parameters
-- JSON request/response handling
-- No external dependencies - only standard library
-- Clean separation of concerns (models, handlers, utils)
-- Proper HTTP status codes (200, 201, 204, 400, 404)
-- Concurrent request handling with goroutines
+- REST API for user management
+- Create, read, and delete users
+- Thread-safe in-memory datastore using `sync.RWMutex`
+- Go 1.22 method-based routing
+- Path parameters with `r.PathValue()`
+- JSON request and response handling
+- Proper HTTP status codes
+- Clean project structure
+- No external dependencies
+
+---
 
 ## API Endpoints
 
-| Method | Endpoint | Description | Status Codes |
-|--------|----------|-------------|--------------|
-| GET | /users | Retrieve all users | 200 OK |
-| POST | /users | Create a new user | 201 Created, 400 Bad Request |
-| GET | /users/{id} | Retrieve a specific user | 200 OK, 404 Not Found |
-| DELETE | /users/{id} | Delete a user | 204 No Content, 404 Not Found |
+| Method | Endpoint      | Description         |
+| ------ | ------------- | ------------------- |
+| GET    | `/users`      | Get all users       |
+| POST   | `/users`      | Create a user       |
+| GET    | `/users/{id}` | Get user by ID      |
+| DELETE | `/users/{id}` | Delete user by ID   |
+
+### Status Codes
+
+- `200 OK`
+- `201 Created`
+- `204 No Content`
+- `400 Bad Request`
+- `404 Not Found`
+
+---
 
 ## Project Structure
 
-```
+```text
 Go_server_no_dep/
-├── main.go              # Server setup and routing
-├── src/
-│   ├── models.go        # Data structures (User, UserStore)
-│   ├── handlers.go      # HTTP handlers (business logic)
-│   └── utils.go         # JSON helper functions
-```
+├── main.go
+└── src/
+    ├── models.go
+    ├── handlers.go
+    └── utils.go
+````
 
-## Prerequisites
+| File          | Purpose                  |
+| ------------- | ------------------------ |
+| `main.go`     | Server setup and routing |
+| `models.go`   | Data models and storage  |
+| `handlers.go` | HTTP handlers            |
+| `utils.go`    | JSON helper functions    |
 
-- Go 1.22 or higher (required for method-based routing patterns)
+---
 
-## Installation
+## Requirements
 
-1. Clone the repository:
+* Go 1.22 or later
+
+---
+
+## Getting Started
+
+### Clone the Repository
+
 ```bash
 git clone https://github.com/yourusername/go-web-server.git
 cd go-web-server
 ```
 
-2. Run the server:
+### Run the Server
+
 ```bash
 go run main.go
 ```
 
-The server will start on `http://localhost:8080`
+Server runs at:
 
-## Usage Examples
+```text
+http://localhost:8080
+```
 
-### Create a User (POST /users)
+---
+
+## Usage
+
+### Create User
 
 ```bash
 curl -X POST http://localhost:8080/users \
@@ -64,6 +100,7 @@ curl -X POST http://localhost:8080/users \
 ```
 
 Response:
+
 ```json
 {
   "id": "1746912345678000000",
@@ -72,35 +109,36 @@ Response:
 }
 ```
 
-### Get All Users (GET /users)
+---
+
+### Get All Users
 
 ```bash
 curl http://localhost:8080/users
 ```
 
 Response:
+
 ```json
 [
   {
     "id": "1746912345678000000",
     "name": "Alice",
     "age": 30
-  },
-  {
-    "id": "1746912345678000001",
-    "name": "Bob",
-    "age": 25
   }
 ]
 ```
 
-### Get a Single User (GET /users/{id})
+---
+
+### Get User By ID
 
 ```bash
 curl http://localhost:8080/users/1746912345678000000
 ```
 
 Response:
+
 ```json
 {
   "id": "1746912345678000000",
@@ -109,57 +147,90 @@ Response:
 }
 ```
 
-### Delete a User (DELETE /users/{id})
+---
+
+### Delete User
 
 ```bash
 curl -X DELETE http://localhost:8080/users/1746912345678000000
 ```
 
-Response: 204 No Content (empty body)
+Response:
 
-### Error Handling Examples
+```text
+204 No Content
+```
 
-Invalid JSON when creating a user:
+---
+
+## Error Examples
+
+### Invalid JSON
+
 ```bash
 curl -X POST http://localhost:8080/users \
   -H "Content-Type: application/json" \
   -d '{"name":"Alice"'
 ```
 
-Response: 400 Bad Request - "Invalid JSON format"
+Response:
 
-User not found:
+```text
+400 Bad Request
+```
+
+---
+
+### User Not Found
+
 ```bash
 curl http://localhost:8080/users/999
 ```
 
-Response: 404 Not Found - "User not found"
+Response:
 
-## Key Go Concepts Demonstrated
+```text
+404 Not Found
+```
 
-- Standard library `net/http` package
-- Go 1.22 routing patterns with method constraints
-- Path parameter extraction using `r.PathValue()`
-- Struct tags for JSON marshaling/unmarshaling
-- Goroutines and concurrency safety with `sync.RWMutex`
-- Defer statements for resource cleanup
-- Pointer receivers for methods
-- Custom helper functions for JSON handling
-- HTTP status codes and response writing
+---
+
+## Go Concepts Used
+
+* `net/http`
+* Go 1.22 routing patterns
+* `r.PathValue()`
+* JSON encoding and decoding
+* Struct tags
+* `sync.RWMutex`
+* Goroutines
+* Pointer receivers
+* Helper functions
+* HTTP status handling
+
+---
 
 ## Why No Dependencies?
 
-Go 1.22 introduced powerful routing features that eliminate the need for third-party routers like `gorilla/mux` or `chi`. The standard library now supports:
+Go 1.22 introduced built-in routing improvements that make external routers unnecessary for many APIs.
 
-- Method-based routing (`GET /users`, `POST /users`)
-- Path parameters (`/users/{id}`)
-- Wildcard matching
+Supported features include:
 
-This project demonstrates that for many REST APIs, the standard library is sufficient, reducing dependencies and improving maintainability.
+* Method-based routing
+* Path parameters
+* Wildcard matching
+
+Using only the standard library keeps the project lightweight, maintainable, and dependency-free.
+
+---
 
 ## License
 
 MIT
 
 ## Author
-Devraj jha
+
+Devraj Jha
+
+```
+```
