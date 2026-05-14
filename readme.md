@@ -230,7 +230,7 @@ MIT
 
 ## Author
 
-Devraj Jha
 
 ```
+Devraj Jha
 ```
