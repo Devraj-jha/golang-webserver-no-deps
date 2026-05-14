@@ -1,10 +1,10 @@
-````markdown
 # Go Web Server (Standard Library Only)
 
 A lightweight REST API server built entirely with Go’s standard library using Go 1.22 routing features.
 
 This project demonstrates how to build a clean and production-ready web server without third-party dependencies while supporting user CRUD operations, JSON handling, and concurrent request safety.
 
+````markdown
 ---
 
 ## Features
